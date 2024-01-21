@@ -1,72 +1,84 @@
 #!/usr/bin/python3
-"""This script takes 2 files as argumrnts
-    first argument: markdown file
-    second argument: html file"""
+"""This script takes 2 files as arguments:
+   - First argument: markdown file
+   - Second argument: html file"""
 
 from sys import argv, stderr
 import os
+import re
+import hashlib
 
+def print_usage_and_exit():
+    print('Usage: ./markdown2html.py README.md README.html', file=stderr)
+    exit(1)
+
+def print_missing_file_and_exit(filename):
+    print('Missing {}'.format(filename), file=stderr)
+    exit(1)
+
+def convert_md5(match):
+    content = match.group(1)
+    md5_hash = hashlib.md5(content.encode('utf-8')).hexdigest()
+    return md5_hash
+
+def remove_characters(match):
+    content = match.group(1)
+    return re.sub('[cC]', '', content)
 
 if __name__ == "__main__":
-    if (len(argv) <= 2):
-        print ('Usage: ./markdown2html.py README.md README.html', file=stderr)
-        exit(1)
-    elif (not os.path.exists(argv[1])):
-        print ('Missing {}'.format(argv[1]), file=stderr)
-        exit(1)
-    else:
-        with open(argv[1], 'r') as md_file:
-            lines = md_file.readlines()
-        L = []
-        unordered_list = []
-        ordered_list = []
-        paragraphs = []
-        p = []
-        for line in lines:
-            if line.startswith('#'):
-                level = line.count('#')
-                L.append('<h{}>{}</h{}>'.format(level,
-                                                line[level+1:],
-                                                level))
-            elif line.startswith('- '):
-                unordered_list.append('<li>{}</li>'.format(line[2:-1]))
-            elif line.startswith('* '):
-                ordered_list.append('<li>{}</li>'.format(line[2:-1]))
-            else:
-                paragraphs.append(line)
-                s = "".join(paragraphs)
-                p = s.split('\n\n')
+    if len(argv) <= 2:
+        print_usage_and_exit()
+    
+    markdown_file = argv[1]
+    output_file = argv[2]
 
-        if unordered_list != []:
-            L.append('<ul>')
-            for elm in unordered_list:
-                L.append('\t'+elm)
-            L.append('</ul>')
+    if not os.path.exists(markdown_file):
+        print_missing_file_and_exit(markdown_file)
 
-        if ordered_list != []:
-            L.append('<ol>')
-            for elm in ordered_list:
-                L.append('\t'+elm)
-            L.append('</ol>')
+    with open(markdown_file, 'r') as md_file:
+        lines = md_file.readlines()
 
-        if p != []:
-            for item in p:
-                if item != '':
-                    if '\n' in item.strip():
-                        item = item.replace('\n', '<br />')
-                    L.append('<p>')
-                    L.append('\t'+item.strip())
-                    L.append('</p>')
+    html_lines = []
+    unordered_list = []
+    ordered_list = []
+    paragraphs = []
+    p = []
 
-        for i, item in enumerate(L):
-            if "**" in item:
-                b = item.split("**")
-                L[i] = item.replace("**{}**".format(b[1]),
-                                    "<b>{}</b>".format(b[1]))
-            if "__" in item:
-                b = item.split("__")
-                L[i] = item.replace("__{}__".format(b[1]),
-                                    "<em>{}</em>".format(b[1]))
-        with open(argv[2], 'w') as html_file:
-            html_file.writelines('\n'.join(L))
-        exit(0)
+    for line in lines:
+        if line.startswith('#'):
+            level = line.count('#')
+            html_lines.append('<h{}>{}</h{}>'.format(level, line[level+1:].strip(), level))
+        elif line.startswith('- '):
+            unordered_list.append('<li>{}</li>'.format(line[2:].strip()))
+        elif line.startswith('* '):
+            ordered_list.append('<li>{}</li>'.format(line[2:].strip()))
+        else:
+            paragraphs.append(line.strip())
+
+    if unordered_list:
+        html_lines.append('<ul>')
+        html_lines.extend(['\t' + item for item in unordered_list])
+        html_lines.append('</ul>')
+
+    if ordered_list:
+        html_lines.append('<ol>')
+        html_lines.extend(['\t' + item for item in ordered_list])
+        html_lines.append('</ol>')
+
+    if paragraphs:
+        for item in paragraphs:
+            if '\n' in item:
+                item = item.replace('\n', '<br />')
+            html_lines.append('<p>{}</p>'.format(item))
+
+    for i, line in enumerate(html_lines):
+        line = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', line)
+        line = re.sub(r'__(.+?)__', r'<em>\1</em>', line)
+        line = re.sub(r'\[\[(.+?)\]\]', convert_md5, line)
+        line = re.sub(r'\(\((.+?)\)\)', remove_characters, line)
+        html_lines[i] = line
+
+    with open(output_file, 'w') as html_file:
+        html_file.write('\n'.join(html_lines))
+
+    exit(0)
