@@ -1,0 +1,61 @@
+:root {
+    --box-width-small: 100px;
+    --box-width-medium: 150px;
+    --box-width-large: 200px;
+    --box-height-small: 70px;
+    --box-height-medium: 100px;
+    --box-height-large: 150px;
+    --font-small: 20px;
+    --font-medium: 40px;
+    --font-large: 70px;
+}
+
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.box {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.box1 {
+    background-color: #1fcd6c;
+    font-size:var(--font-small);
+    width: var(--box-width-small);
+    height: var(--box-height-small);
+}
+
+.box2 {
+    background-color: #2d98de;
+    font-size: var(--font-medium);
+    width: var(--box-width-medium);
+    height: var(--box-height-medium);
+}
+
+.box3 {
+    background-color: #344a61;
+    width: var(--box-width-large);
+    height: var(--box-height-large);
+    font-size: var(--font-large);
+}
+
+.box4 {
+    background-color: #9d55b9;
+    font-size: var(--font-medium);
+    width: var(--box-width-medium);
+    height: var(--box-height-medium);
+}
+
+.box5 {
+    background-color: #ea7d04;
+    font-size: var(--font-small);
+    width: var(--box-width-small);
+    height: var(--box-height-small);
+}
