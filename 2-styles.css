@@ -1,0 +1,60 @@
+* {
+    box-sizing: border-box;
+    font-size: 20px;
+    font-family: Arial;
+}
+
+label {
+    display: inline-block;
+    position: relative;
+    height: 40px;
+    width: 100px;
+    background-color: #f8f6f6;
+    cursor: pointer;
+    border: 1px solid rgb(219, 217, 217);
+    border-radius: 20px;
+}
+
+input {
+    display: none;
+}
+
+
+input:checked + label {
+    background: #CD5C5C;
+}
+
+label::after {
+    content: "No";
+    position: absolute;
+    top: 50%;
+    left: 70px;
+    transform: translate(-50%, -50%);
+    color: rgb(196, 193, 193);
+}
+
+input:checked + label::after {
+    content: "Yes";
+    position: absolute;
+    top: 50%;
+    left: 35px;
+    transform: translate(-50%, -50%);
+    color: white;
+}
+
+
+.toggle-switch {
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: 2px solid rgb(219, 217, 217);
+    background-color: #ffffff;
+}
+
+input:checked + label .toggle-switch {
+    left: 60px;
+    top: -5px;
+}
