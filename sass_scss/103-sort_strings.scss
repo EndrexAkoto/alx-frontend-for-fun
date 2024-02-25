@@ -1,1 +1,6 @@
-$list_to_sort: john anna zoe kim felicia carrie;
+//sorting a list
+@import '103-sort_list';
+
+$sorted-list: sort($list_to_sort);
+
+@debug $sorted-list;
